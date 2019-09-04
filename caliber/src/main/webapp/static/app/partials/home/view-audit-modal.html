@@ -1,0 +1,64 @@
+
+<!--********************************************* View Quality Audit Modal ************************************-->
+
+<div class="modal fade" id="viewLastAudit" tabindex="-1" role="dialog"
+	aria-labelledby="traineeModalLabel">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="traineeModalLabel">Quality Audit Report - Week {{displayWeek}}</h4>
+			</div>
+			<div class="modal-body">
+				<div class="col-sm-12 col-md-12 col-lg-12 top5">
+						<table
+							class="table table-responsive col-sm-12 col-md-12 col-lg-12"
+							style="border-collapse: collapse;" ng-show="currentView">
+							<thead>
+								<tr>
+									<strong>Categories covered this week: </strong>
+									<span ng-repeat="category in categories">{{category}}{{$last
+										? '' : ', '}}</span>
+								</tr>
+								<tr>
+									<th>Trainee</th>
+									<th>Individual Feedback</th>
+									<th>Notes</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="trainee in currentBatch.trainees track by $index">
+									<td class="col-sm-2 col-md-2 col-lg-2">{{ trainee.name }}</td>
+									<td>{{faces[$index].qcStatus && faces[$index].qcStatus != "Undefined" ? faces[$index].qcStatus :
+										"-"}}</td>
+									<td class="col-sm-9 col-md-9 col-lg-9">{{faces[$index].content && faces[$index].content != "Undefined"
+										? faces[$index].content : "-"}}</td>
+								</tr>
+							</tbody>
+						</table>
+						<!-- QC batch note -- overall qualitative feedback -->
+						<table class='table'>
+							<tr>
+								<td
+									class="col-lg-2 col-md-2 col-sm-2 col-sm-offset-2 text-weight-bold"><strong>Overall
+										Feedback:</strong></td>
+								<td class="col-lg-10 col-md-10 col-sm-10 col-sm-offset-10">
+									{{bnote.qcStatus ? bnote.qcStatus : "-"}}</td>
+							</tr>
+							<tr>
+								<td
+									class="col-lg-2 col-md-2 col-sm-2 col-sm-offset-2 text-weight-bold"><strong>Notes:</strong></td>
+								<td class="col-lg-10 col-md-10 col-sm-10 col-sm-offset-10">
+									{{bnote.content ? bnote.content : "-"}}</td>
+							</tr>
+						</table>
+					</div>
+					<div class="modal-footer"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

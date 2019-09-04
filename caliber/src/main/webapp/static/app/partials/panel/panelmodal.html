@@ -1,0 +1,158 @@
+
+
+<!-- @author Matt 'Spring Data' Prass -->
+<!-- @author Lauren Wallace -->
+<!-- @author Katie Bixby -->
+<form ng-init="preventModalClose()">
+	<div id="panelmodal" class="modal fade">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+ 					<div style="float:left;"><h4 class="modal-title" id="panelFeedbackModal">Panel Interview Feedback Form</h4></div>
+ 				</div>
+				<div class="modal-body">
+				<div class="row">
+					<div class="col-xs-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">Interview Details</div>
+						<div class="panel-body">
+							<div class="form-group col-xs-6">
+								<b>Associate Name</b> <input type="text" class="form-control" ng-model="trainee.name" disabled /> 
+								<b>Training Track</b> <input type="text" class="form-control" ng-model="batchSkillType" disabled />
+								<b>Panel Round</b> <input type="number" class="form-control" ng-model="panelRound.model" disabled /> 
+								<b>Recording Consent</b> <select ng-options="option.exp for option in recordingConsent.options" ng-model="recordingConsent.model" placeholder="" class="form-control" id="recordConsent"></select>
+												<option value="" disabled>
+							</div>
+							<div class="form-group col-xs-6">
+								<b>Interview Date</b> <div class="input-group">
+													  <input class="date-input form-control date-selector" name="i"
+													  min="0" placeholder="Interview Date" 
+													  moment-picker="interviewDate.model" format="YYYY-MMM-DD"
+													  ng-model="interviewDate.model"
+													  ng-model-options="{ updateOn: 'blur' }" ng-required="true">
+													  <i class="input-group-addon glyphicon glyphicon-calendar"></i>
+													  </div>
+								<b>Interview Time</b> <div class="input-group">
+													  <input class="date-input form-control time-selector" name="t"
+													  min="0" placeholder="Interview Time" 
+													  moment-picker="ctrl.timepicker" format="hh:mm A"
+													  ng-model="interviewTime.model"
+													  ng-model-options="{ updateOn: 'blur' }" ng-required="true">
+													  <i class="input-group-addon glyphicon glyphicon-time"></i>
+													  </div>
+								<b>Interview Mode</b> <select ng-model="interviewMode.model" placeholder="Select a Mode" class="form-control" id="interviewMode" ng-required="true"><option ng-repeat="option in interviewMode.options">{{option}}</option></select>
+								<b>Internet Connectivity</b> <select ng-model="interviewConnectivity.model" placeholder="Select Connectivity" class="form-control" id="interviewConnectivity" required><option ng-repeat="option in interviewConnectivity.options">{{option}}</option></select>
+							</div>
+						</div>
+					</div>
+					</div>
+					<div class="col-xs-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">General Feedback</div>
+						<div class="panel-body">
+							<table id="generalFeedback" class="table table=responsive">
+                            	<tr>
+                                	<th>Criteria</th>
+                                	<th>Comment</th>
+                            	</tr>
+                            	<tr>
+                                	<td><b>Associate Introduction</b></td>
+                                	<td><input type="text" ng-model="associateIntro.model" class="form-control" id="generalFeedback.ai"></td>
+                            	</tr>
+                            	<tr>
+                                	<td><b>Project 1 Explanation</b></td>
+                                	<td><input type="text" ng-model="p1Expl.model" class="form-control" id="generalFeedback.p1expl"></td>
+                            	</tr>
+                            	<tr>
+                                	<td><b>Project 2 Explanation</b></td>
+                                	<td><input type="text" ng-model="p2Expl.model" class="form-control" id="generalFeedback.p2expl"></td>
+                            	</tr>
+                            	<tr>
+                                	<td><b>Project 3 Explanation</b></td>
+                                	<td><input type="text" ng-model="p3Expl.model" class="form-control" id="generalFeedback.p3expl"></td>
+                            	</tr>
+                            	<tr>
+                                	<td><b>Soft Skills</b></td>
+                                	<td><input type="text" ng-model="communicationSkills.model" class="form-control" id="generalFeedback.commskills"></td>
+                            	</tr>
+                        	</table>
+						</div>
+					</div>
+					</div>
+					</div>
+					<div class="row">
+					<div class="col-xs-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">Technical Feedback</div>
+						<div class="panel-body">
+							<table id="technicalFeedback" class="table table=responsive">
+                        		<tr>
+                            		<th>Technology</th>
+                            		<th>Result</th>
+                            		<th>Repanel</th>
+                            		<th>Comment</th>
+                        		</tr>
+                        		<tr class="form-group" ng-repeat="techs in techFeedback track by $index">
+                            		<td ng-bind="techs.technology.skillCategory"></td>
+                            		<td ng-bind="techs.result"></td>
+                            		<td ng-bind="techs.status"></td>
+                            		<td ng-bind="techs.comment"></td>
+                            		<td><button type="submit" ng-click="deleteRow($index)" style="background:transparent;border:transparent"><span class="glyphicon glyphicon-remove" style="color: #F26925;" aria-hidden="true"></span></div></td>
+                        		</tr>
+                        		<tr class="form-group">
+                        			<td>
+                        				<select ng-model="technologies.model" ng-options="option.skillCategory for option in technologies.options" class="form-control" id="technicalFeedback.technology"></select>
+                            		</td>
+                            		<td>
+                            			<select ng-options="option.exp for option in panelResult.options" ng-model="panelResult.model" class="form-control" id="technicalFeedback.result"></select>
+                            		</td>
+                            		<td>
+                            			<select ng-model="repanel.model" class="form-control" id="technicalFeedback.repanel"><option ng-repeat="option in repanel.options">{{option}}</option></select>
+                            		</td>
+                            		<td>
+                            			<input type="text" class="form-control" id="technicalFeedback.comment" ng-model="techComment.model">
+                            		</td>
+                            		<td>
+                            			<button type="submit" ng-click="addRow()" style="background:transparent;border:transparent"><span class="glyphicon glyphicon-plus" style="color: #F26925;" aria-hidden="true"></span>
+                            		</td>
+                        		</tr>
+                    		</table>
+						</div>
+					</div>
+					</div>
+					</div>
+					<div class="row">
+					<div class="col-xs-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">Overall Feedback</div>
+						<div class="panel-body">
+							<div class="row">
+								<div class="form-group col-xs-2">
+                            		<b>Interview Duration</b> <input type="text" class="form-control" ng-model="interviewDuration.model" ng-bind="panelInterview.duration" />
+                            	</div>
+                            	<div class="form-group col-xs-10">
+                            		<b>Recording Link</b> <input type="text" class="form-control" ng-model="recordingLink.model" ng-bind="panelInterview.link" />
+                            	</div>
+                            </div>
+                            <div class="row">
+                            	<div class="form-group col-xs-2"><b>Panel Status</b><input type="text" class="form-control" ng-model="overallStatus.model" disabled ng-required ="true" />
+                            	</div>
+                            	<div class="form-group col-xs-10">
+                            		<b>Overall</b><input type="text" class="form-control" ng-model="overallPanel.model" id="overallFeedback.overall" />
+                            	</div>
+							</div>
+						</div>
+					</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<input type="submit" value="Save" class="btn btn-primary" data-dismiss="modal" ng-click="savePanel()">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>

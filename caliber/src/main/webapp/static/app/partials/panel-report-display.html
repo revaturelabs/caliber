@@ -1,0 +1,167 @@
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12 col-md-12 col-lg-12">
+			<div class="panel panel-default">
+				<div class="panel-heading clearfix" role="tab" id="headingOne">
+					Panel Interview Feedback
+					<!-- Buttons for our panel report -->
+					<div style="display:inline" ng-if="panelIndex > traineePanelData.length-1">{{resetPanelIndex()}}</div>
+					<i ng-click="incrementPanel()">
+						<div style="display:inline" ng-if="panelIndex < traineePanelData.length-1">
+							<i class="clickableIcons glyphicon glyphicon-chevron-right pull-right move-glyphicon"></i>
+						</div>
+					</i> 
+					<span class="pull-right">Round <span ng-bind="traineePanelData[panelIndex].panelRound"></span></span> 
+					<i ng-click="decrementPanel()">
+						<div style="display:inline" ng-if="panelIndex > 0">
+							<i class="clickableIcons glyphicon glyphicon-chevron-left pull-right move-glyphicon"></i>
+						</div>
+					</i>
+					<!-- Buttons for our panel report -->
+				</div><!-- End Of First Panel Head -->
+				<div class="panel-body pBody">
+					<div class="row add-margin">
+						<div class="col-sm-6">
+							<div class="row">
+								<div class="col-8 col-sm-6">
+									<strong>Associate Name</strong>
+								</div>
+								<div class="col-4 col-sm-6 add-space">
+									<span ng-bind="traineePanelData[panelIndex].trainee.name"></span>
+								</div>
+								<div class="col-8 col-sm-6 add-space">
+									<strong>Panelist Name</strong>
+								</div>
+								<div class="col-4 col-sm-6 add-space">
+									<span ng-bind="traineePanelData[panelIndex].panelist.name"></span>
+								</div>
+								<div class="col-8 col-sm-6 add-space">
+									<strong> Panel Round</strong>
+								</div>
+								<div class="col-4 col-sm-6 add-space">
+									<span ng-bind="traineePanelData[panelIndex].panelRound"></span>
+								</div>
+								<div class="col-8 col-sm-6 add-space">
+									<strong>Recording Consent</strong>
+								</div>
+								<div class="col-4 col-sm-6 add-space">
+									<span ng-if ="traineePanelData[panelIndex].recordingConsent == 'Yes' ">Yes</span>
+									<span ng-if ="traineePanelData[panelIndex].recordingConsent == 'No' ">No</span>
+									<span ng-if ="traineePanelData[panelIndex].recordingConsent == 'Did Not Ask' ">Did Not Ask</span>
+								</div>
+								<div class="col-8 col-sm-6 add-space">
+									<strong>Recording Link</strong>
+								</div>
+								<div class="col-4 col-sm-6 add-space">
+									<span ng-bind="traineePanelData[panelIndex].recordingLink"></span>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-sm-6">
+								<div class="row">
+									<div class="col-8 col-sm-6 add-space">
+										<strong>Interview Date</strong>
+									</div>
+									<div class="col-4 col-sm-6 add-space">
+										<span ng-bind="traineePanelData[panelIndex].interviewDate"></span>
+									</div>
+									<div class="col-8 col-sm-6 add-space">
+										<strong>Interview Duration</strong>
+									</div>
+									<div class="col-4 col-sm-6 add-space">
+										<span ng-bind="traineePanelData[panelIndex].duration"></span>
+									</div>
+									<div class="col-8 col-sm-6 add-space">
+										<strong>Interview Format</strong>
+									</div>
+									<div class="col-4 col-sm-6 add-space">
+										<span ng-bind="traineePanelData[panelIndex].format"></span>
+									</div>
+									<div class="col-8 col-sm-6 add-space">
+										<strong>Overall Feedback</strong>
+									</div>
+									<div class="col-4 col-sm-6 add-space">
+										<span ng-bind="traineePanelData[panelIndex].overall"></span>
+									</div>
+									<div class="col-8 col-sm-6 add-space">
+										<strong>Internet Connectivity</strong>
+									</div>
+									<div class="col-4 col-sm-6 add-space">
+										<span ng-bind="traineePanelData[panelIndex].internet"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="panelReportDisplay" class="panel-heading">Technical
+						Feedback</div>
+					<table id="feedback" class="table table-responsive removeSpaces">
+						<thead>
+							<tr>
+								<th>Technology</th>
+								<th class ="center">Result</th>
+								<th class ="center">Status</th>
+								<th class ="center">Comment</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="item in traineePanelData[panelIndex].feedback">
+								<td ng-bind="item.technology.skillCategory"></td>
+								<td class ="center" ng-bind="item.result"></td>
+								<td class ="center"><span ng-if="item.status == 'Pass'"
+									class="glyphicon glyphicon-ok"></span> <span
+									ng-if="item.status == 'Repanel'"
+									class="glyphicon glyphicon-remove"></span></td>
+								<td class ="center" ng-bind="item.comment"></td>
+							</tr>
+						</tbody>
+					</table>
+
+					<div id="panelReportDisplay" class="panel-heading">General
+						Feedback</div>
+					<table id="feedback" class="table table-responsive removeSpaces">
+						<thead>
+							<tr>
+								<th>Criteria</th>
+								<th class ="center">Comment</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><b>Associate Introduction</b></td>
+								<td class ="center" ng-bind="traineePanelData[panelIndex].associateIntro"></td>
+							</tr>
+							<tr>
+								<td><b>Project 1 Explanation</b></td>
+								<td  class ="center" ng-bind="traineePanelData[panelIndex].projectOneDescription"></td>
+							</tr>
+							<tr>
+								<td><b>Project 2 Explanation</b></td>
+								<td  class ="center" ng-bind="traineePanelData[panelIndex].projectTwoDescription"></td>
+							</tr>
+							<tr>
+								<td><b>Project 3 Explanation</b></td>
+								<td class ="center"
+									ng-bind="traineePanelData[panelIndex].projectThreeDescription"></td>
+							</tr>
+							<tr>
+								<td><b>Communication Skills</b></td>
+								<td  class ="center" ng-bind="traineePanelData[panelIndex].communicationSkills"></td>
+							</tr>
+							<tr>
+								<td><b>Overall</b></td>
+								<td  class ="center" ng-bind="traineePanelData[panelIndex].overall"></td>
+							</tr>
+						</tbody>
+					</table>
+				</div><!-- End Of Panel Body -->
+			</div><!-- End of Main Panel -->
+		</div>
+	</div>
+</div><!-- Closeing container -->
+
+
+
+

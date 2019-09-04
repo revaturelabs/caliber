@@ -1,0 +1,97 @@
+<!-- Welcome new trainer -->
+<!-- <script src="/static/app/resources/js/controllers/trainerHomeController.js"></script> -->
+<div class="container" ng-init="alertPopup()">
+	<h1>Welcome to Caliber!</h1>
+	<div>
+		<p>To get started, please visit the <a
+			href="https://github.com/pjw6193/caliber/wiki#user-guide">user guide</a> for an
+		introduction and orientation.</p>
+	</div>
+	<br/>
+	<div id="alertModal" class="modal fade" role="dialog">
+  		<div class="modal-dialog">
+			<!-- Modal content-->
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal">&times;</button>
+		        <h4 class="modal-title">Batch Locations warning</h4>
+		      </div>
+		      <div class="modal-body">
+		        <h4>{{alertMessage}}</h4>
+		        <div class="container" ng-repeat="batch in batchesToUpdate">
+		        	<form>
+		        		<h3>{{batch.trainingName}}</h3> 						
+		        	</form>		        	
+		        </div>
+		        
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		     	
+		      </div>
+		    </div>
+      	</div>
+	</div>
+    
+</div>
+
+<!-- Charts -->
+<div class="container" ng-if="currentBatch">
+	<div class="top10 data-container">
+		<div class="row">
+			<div class="col-sm-12 col-md-12 col-lg-12">
+				<div class="row">
+					<div class="col-sm-12 col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-heading panel-rev">Cumulative Scores</div>
+							<div class="panel-body">
+								<div class="chart-container top5">
+									<canvas id="bar6" class="chart chart-bar"
+										chart-data="batchOverAllData"
+										chart-options="batchOverAllOptions"
+										chart-labels="batchOverAllLabels"
+										chart-series="batchOverAllSeries"
+										chart-colors="batchOverAllColors"
+										chart-dataset-override="batchOverAllDsOverride">
+                                    	</canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-6 col-md-6">
+						<div class="panel panel-default">
+							<div class="panel-heading">Technical Skills</div>
+							<div class="panel-body">
+								<div class="chart-container top5">
+									<canvas id="radarBatchOverall" class="chart chart-radar"
+										chart-data="radarBatchOverallData"
+										chart-options="radarBatchOverallOptions"
+										chart-labels="radarBatchOverallLabels"
+										chart-series="radarBatchOverallSeries"
+										chart-colors="radarBatchOverallColors">
+                                    </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-6 col-md-6">
+						<div class="panel panel-default">
+							<div class="panel-heading">Last Quality Audit</div>
+							<div class="panel-body">
+								<div class="chart-container top5">
+									<canvas id="doughnut1" class="chart chart-doughnut chart-xs"
+										chart-labels="currentQCStatsLabels"
+										chart-data="currentQCStatsData"
+										chart-options="currentQCStatsOptions"
+										chart-colors="currentQCStatsColors">
+                                    </canvas>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

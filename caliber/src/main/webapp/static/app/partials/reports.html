@@ -1,0 +1,825 @@
+<div class="container">
+	<div class="row">
+		<div class="col-md-12 col-lg-12">
+			<!-- Generate PDF of current page -->
+			<div class="dropdown pull-right" ng-show="reticulatingSplines">
+				<a href="" style="pointer-events: none; cursor: default;"
+					title="Processing.." ng-show="reticulatingSplines"
+					ng-show="showSaving"> <i style="color: #F26925;"
+					class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+				</a>
+			</div>
+			<div class="dropdown pull-right" ng-hide="reticulatingSplines">
+				<button ng-hide="reticulatingSplines" class="btn btn-default dropdown-toggle" type="button"
+					id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true"
+					aria-expanded="true">
+					<span> <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+					</span> <span class="caret"></span>
+				</button>
+				<ul ng-hide="reticulatingSplines" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+					<li><a href="" ng-hide="reticulatingSplines" ng-click="downloadAllChartButton()"> Charts
+					</a></li>
+					<li><a href="" ng-click="generatePDF()"> Charts + Feedback
+					</a></li>
+				</ul>
+			</div>
+
+			<!-- Search for single Trainee -->
+			<div class="container-1 pull-right hideDropdown">
+				<form ng-submit="selectChosenTrainee()">
+					<span class="icon"><button type="submit"
+							class="SearchButton">
+							<i class="fa fa-search"></i>
+						</button></span> <input ng-change="populateTraineeList()" ng-model="chosenTrainee"
+						list="traineeList" type="search" id="searchTextBox"
+						placeholder="Search..." class="form-control SearchPad"
+						autocomplete="off" />
+					<datalist id="traineeList">
+						<option ng-repeat="trainee in allTrainees track by $index"
+							ng-value="trainee.name" ng-if="chosenTrainee.length>0">
+							{{trainee.name}} | {{trainee.email}} | {{trainee.skypeId}}</option>
+					</datalist>
+				</form>
+			</div>
+
+			<ul class="nav nav-tabs">
+				<!-- Filter batches by year -->
+				<li role="button" class="dropdown"><a class="dropdown-toggle"
+					data-toggle="dropdown">{{selectedYear}} <span class="caret"></span>
+				</a>
+					<ul class="dropdown-menu">
+						<li ng-repeat="year in years track by $index"><a
+							role="button" ng-click="selectYear($index)">{{year}}</a></li>
+					</ul></li>
+				<!-- Select Batch-->
+				<li role="button" class="dropdown" ng-show="hideOtherTabs()"><a
+					class="dropdown-toggle" data-toggle="dropdown">{{currentBatch.trainer.name}}
+						- {{ currentBatch.startDate | date:'shortDate' }} <span
+						class="caret"></span>
+				</a>
+					<ul class="dropdown-menu">
+						<li ng-repeat="batch in batchesByYear track by $index"><a
+							role="button" ng-click="selectCurrentBatch($index)">{{batch.trainer.name}}
+								- {{batch.startDate | date:'shortDate'}}</a></li>
+					</ul></li>
+				<!-- Select Week-->
+				<li role="button" class="dropdown" ng-show="hideOtherTabs()"><a
+					class="dropdown-toggle" data-toggle="dropdown">Week
+						{{reportCurrentWeek}} <span class="caret"></span>
+				</a>
+					<ul class="dropdown-menu">
+						<li><a role="button" ng-click="selectCurrentWeek('(All)')">All</a>
+						</li>
+						<li ng-repeat="week in currentBatchWeeks"><a role="button"
+							ng-click="selectCurrentWeek(week)">Week {{week}}</a></li>
+					</ul></li>
+
+				<!-- Select Trainee-->
+				<li role="button" ng-show="hideOtherTabs()" class="dropdown"><a
+					class="dropdown-toggle" data-toggle="dropdown">{{currentTrainee.name}}
+						<span class="caret"></span>
+				</a>
+					<ul class="dropdown-menu">
+						<li><a role="button" ng-click="selectCurrentTrainee(-1)">All</a>
+						</li>
+						<li ng-repeat="trainee in currentBatch.trainees track by $index">
+							<a role="button" ng-click="selectCurrentTrainee($index)">{{trainee.name}}</a>
+						</li>
+					</ul></li>
+
+				<!-- Select Training Type-->
+				<!-- 	<li role="button" class="dropdown"><a
+								class="dropdown-toggle" data-toggle="dropdown"> Training
+									Types<span class="caret"></span>
+							</a>
+								<ul class="dropdown-menu">
+									<li ng-repeat="type in batchTypes track by $index"><a
+										role="button" ng-click="selectCurrentBatchType($index)">{{batchType.typeName}}</a></li>
+								</ul></li>
+							Select Skill Stack
+							<li role="button" class="dropdown"><a
+								class="dropdown-toggle" data-toggle="dropdown">Skill Stack<span
+									class="caret"></span>
+							</a>
+								<ul class="dropdown-menu">
+									<li ng-repeat="type in batchTypes track by $index"><a
+										role="button" ng-click="selectCurrentBatchType($index)">{{batchType.typeName}}</a></li>
+								</ul></li>
+							<li><span id="start-date" data-datepicker="true"> <input
+									ng-model="startDate.model" ng-value="startDate"
+									class="date-input form-control date-selector" name="s" min="0"
+									type="date" ng-required="true">
+							</span></li>
+							<li>
+								<button type="submit" class="btn btn-primary"
+									style="margin-left: 0.5em">Filter</button>
+							</li>	 -->
+			</ul>
+		</div>
+	</div>
+	<!-- Display if there is no data -->
+	<div class="bg-primary align center" ng-if="!currentBatch">No
+		data available for {{selectedYear}}.</div>
+</div>
+<!-- No Selected Batches -->
+<div ng-show="noBatches">
+	<h1>Please select a batch:</h1>
+</div>
+
+<!-- Charts -->
+<div id="caliber-container" class="container" ng-if="currentBatch">
+	<div class="top10 data-container">
+
+		<!-- Batch -> Week -->
+		<div class="row" ng-if="batchWeek">
+			<div class="col-sm-12 col-md-12 col-lg-12">
+				<div class="row">
+					<div class="col-sm-12 col-md-12 col-lg-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">Cumulative Scores</div>
+							<div class="panel-body">
+								<div class="chart-container top5">
+									<canvas id="bar1" class="chart chart-bar"
+										chart-data="averageTraineeScoresWeeklyData"
+										chart-options="averageTraineeScoresWeeklyOptions"
+										chart-labels="averageTraineeScoresWeeklyLabels"
+										chart-series="averageTraineeScoresWeeklySeries"
+										chart-colors="averageTraineeScoresWeeklyColors"
+										chart-dataset-override="averageTraineeScoresWeeklyDsOverride">
+									</canvas>
+									<div class="table-responsive">
+										<table ng-if="averageTraineeScoresWeeklyLabels" class="table"
+											style="border-collapse: collapse;">
+											<tr
+												ng-repeat="label in averageTraineeScoresWeeklyLabels track by $index"
+												class="col-md-4 col-sm-4">
+												<th class="pull-left">{{label}}</th>
+												<td class="pull-right">{{averageTraineeScoresWeeklyData[0][$index]}}</td>
+											</tr>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--  Row with First Chart -->
+
+				<div class="row">
+					<div class="col-sm-4 col-md-4 col-lg-4">
+						<div class="panel panel-default">
+							<div class="panel-heading">Quality Audit</div>
+							<div class="panel-body">
+								<div class="chart-container top5">
+									<canvas id="doughnut1" class="chart chart-doughnut chart-xs"
+										chart-labels="qcStatsLabels" chart-data="qcStatsData"
+										chart-options="qcStatsOptions" chart-colors="qcStatsColors">
+									</canvas>
+									<div class="table-responsive">
+										<table ng-if="qcStatsLabels" class="table"
+											style="border-collapse: collapse;">
+											<tr>
+												<th class="col-sm-3 col-md-3 col-lg-3"
+													ng-repeat="item in qcStatsLabels">{{item}}</th>
+											</tr>
+											<tr class="text-center">
+												<td class="col-sm-3 col-md-3 col-lg-3 ng-binding"
+													ng-repeat="dataPoint in qcStatsData track by $index">{{dataPoint}}</td>
+											</tr>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Yanilda -->
+					<div class="col-sm-8 col-md-8 col-lg-8">
+						<div class="panel panel-default">
+							<div class="panel-heading">Assessment Breakdown</div>
+							<div class="panel-body">
+								<div class="chart-container top5">
+									<canvas id="barchart" class="chart chart-bar"
+										chart-data="barchartAWData" chart-series="barchartAWSeries"
+										chart-labels="barchartAWLabels"
+										chart-options="barchartAWOptions"
+										chart-colors="barchartAWColors">
+									</canvas>
+									<div class="table-responsive">
+										<table ng-if="barchartAWLabels" class="table"
+											style="border-collapse: collapse;">
+											<tr class="col-md-6 col-sm-6"
+												ng-repeat="label in barchartAWLabels track by $index">
+
+												<th class="pull-left">{{label}}</th>
+												<td class="pull-right">{{barchartAWData[0][$index]}}</td>
+											</tr>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Row With Bottom 2 Charts -->
+			<!-- trainer display -->
+			<div ui-view="trainer-display" ng-if="displayTable()"></div>
+			<!-- qc -->
+			<div ui-view="qc-batchOverall"></div>
+		</div>
+
+		<!-- Batch -> Overall -->
+		<div class="row" ng-if="batchOverall">
+			<div class="col-sm-12 col-md-12 col-lg-12">
+				<div class="row">
+					<div class="col-sm-12 col-md-12 col-lg-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								Cumulative Scores <i ng-click="downloadChartButton($event)"
+									class="clickableIcons glyphicon glyphicon-save"></i>
+							</div>
+							<div class="panel-body">
+								<div class="chart-container top5">
+									<canvas id="line6" class="chart chart-bar"
+										chart-data="batchOverAllData"
+										chart-options="batchOverAllOptions"
+										chart-labels="batchOverAllLabels"
+										chart-series="batchOverAllSeries"
+										chart-colors="batchOverAllColors"
+										chart-dataset-override="batchOverAllDsOverride">
+									</canvas>
+									<div class="table-responsive">
+										<table ng-if="batchOverAllLabels" class="table"
+											style="border-collapse: collapse;">
+											<tr ng-repeat="label in batchOverAllLabels track by $index"
+												class="col-md-4 col-lg-4 col-sm-6 col-xs-6">
+												<th class="pull-left">{{label}}</th>
+												<td class="pull-right">{{batchOverAllData[1][$index]}}</td>
+											</tr>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!--  QC BATCH REPORT VIEW -->
+				<!-- ******************************************************************************************-->
+				<div class="row" ng-if="batchOverall">
+					<div class="col-sm-12 col-md-12 col-lg-12">
+						<div class="row">
+							<div class="col-sm-12 col-md-12 col-lg-12">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										Batch QC Report <i ng-click="downloadChartButton($event)"
+											class="clickableIcons glyphicon glyphicon-save"></i>
+									</div>
+									<div class="panel-body">
+										<div class="table-responsive">
+											<!-- This table displays if there is no QC status data. -->
+											<table ng-if="allQCTraineeNotesAllWeeks.length == 0"
+												class="table table-bordered"
+												style="border-collapse: collapse;">
+												<tr>
+													<th class="text-center">No QC data available at this
+														time.</th>
+												</tr>
+											</table>
+											<table ng-if="allQCTraineeNotesAllWeeks.length !== 0"
+												class="table table-bordered"
+												style="border-collapse: collapse;">
+												<tr>
+													<th>Trainee</th>
+													<th class="text-center"
+														ng-repeat="item in allQCTraineeNotesAllWeeks[0]">Week
+														{{item.week}}</th>
+												</tr>
+												<tr ng-repeat="traineeInfo in allQCTraineeNotesAllWeeks">
+													<td class="col-sm-3 col-md-3 col-lg-3">{{getQCTraineeName(traineeInfo)}}</td>
+													<td class="text-center " ng-repeat="status in traineeInfo">
+														<div ng-if="status.qcStatus == 'Superstar'"
+															id="{{getQCTraineeName(traineeInfo)}}"
+															value="{{status.noteId}}">
+															<a
+																ng-click="populateModal(getQCTraineeName(traineeInfo),status.noteId)"
+																data-toggle="modal" data-target="#notesModal"
+																class="fa fa-star fa-2x pick mouse-over"></a>
+														</div>
+														<div ng-if="status.qcStatus == 'Good'"
+															id="{{getQCTraineeName(traineeInfo)}}"
+															value="{{status.noteId}}">
+															<a
+																ng-click="populateModal(getQCTraineeName(traineeInfo),status.noteId)"
+																data-toggle="modal" data-target="#notesModal"
+																class="fa fa-smile-o fa-2x pick mouse-over"></a>
+														</div>
+														<div ng-if="status.qcStatus == 'Average'"
+															id="{{getQCTraineeName(traineeInfo)}}"
+															value="{{status.noteId}}">
+															<a
+																ng-click="populateModal(getQCTraineeName(traineeInfo),status.noteId)"
+																data-toggle="modal" data-target="#notesModal"
+																class="fa fa-meh-o fa-2x pick mouse-over"></a>
+														</div>
+														<div ng-if="status.qcStatus == 'Poor'"
+															id="{{getQCTraineeName(traineeInfo)}}"
+															value="{{status.noteId}}">
+															<a
+																ng-click="populateModal(getQCTraineeName(traineeInfo),status.noteId)"
+																data-toggle="modal" data-target="#notesModal"
+																class="fa fa-frown-o fa-2x pick mouse-over"></a>
+														</div>
+														<div
+															ng-if="status.qcStatus == null || status.qcStatus == 'Undefined'"
+															id="{{getQCTraineeName(traineeInfo)}}"
+															value="{{status.noteId}}">
+															<a
+																ng-click="populateModal(getQCTraineeName(traineeInfo),status.noteId)"
+																data-toggle="modal" data-target="#notesModal"
+																class="fa fa-question-circle fa-2x mouse-over"></a>
+														</div>
+													</td>
+												</tr>
+												<tr id="overallRow">
+													<th class="col-sm-3 col-md-3 col-lg-3">Overall</th>
+													<td class="text-center" ng-repeat="note in batchQCNotes">
+
+														<div ng-if="note.qcStatus == 'Superstar'">
+															<a ng-click="populateOverallModal(note)"
+																data-toggle="modal" data-target="#batchOverallModal"
+																class="fa fa-star fa-2x pick mouse-over"></a>
+														</div>
+														<div ng-if="note.qcStatus == 'Good'">
+															<a ng-click="populateOverallModal(note)"
+																data-toggle="modal" data-target="#batchOverallModal"
+																class="fa fa-smile-o fa-2x pick mouse-over"></a>
+														</div>
+														<div ng-if="note.qcStatus == 'Average'">
+															<a ng-click="populateOverallModal(note)"
+																data-toggle="modal" data-target="#batchOverallModal"
+																class="fa fa-meh-o fa-2x pick mouse-over"></a>
+														</div>
+														<div ng-if="note.qcStatus == 'Poor'">
+															<a ng-click="populateOverallModal(note)"
+																data-toggle="modal" data-target="#batchOverallModal"
+																class="fa fa-frown-o fa-2x pick mouse-over"></a>
+														</div>
+														<div
+															ng-if="note.qcStatus == null || note.qcStatus == 'Undefined'">
+															<a ng-click="populateOverallModal(note)"
+																data-toggle="modal" data-target="#batchOverallModal"
+																class="fa fa-question-circle fa-2x pick mouse-over"></a>
+														</div>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- ****************************************************************************************** -->
+
+			<div class="row">
+				<div class="col-sm-5 col-md-5 col-lg-5">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							Technical Skills <i ng-click="downloadChartButton($event)"
+								class="clickableIcons glyphicon glyphicon-save"></i>
+							<div role="button" class="pull-right" data-toggle="modal"
+								data-target="#insert-trainee">
+								<i class="fa fa-user-circle-o fa-lg" aria-hidden="true"></i>
+							</div>
+						</div>
+						<div class="panel-body">
+							<div class="chart-container top5">
+								<canvas id="radarBatchOverall" class="chart chart-radar"
+									chart-data="radarBatchOverallData"
+									chart-options="radarBatchOverallOptions"
+									chart-labels="radarBatchOverallLabels"
+									chart-series="radarBatchOverallSeries"
+									chart-colors="radarBatchOverallColors">
+								</canvas>
+								<div class="table-responsive">
+									<table ng-if="radarBatchOverallTable" class="table"
+										style="border-collapse: collapse;">
+										<tr>
+											<th class="col-sm-2 col-md-2 col-lg-2"></th>
+											<th class="col-sm-2 col-md-2 col-lg-2"
+												ng-repeat="series in radarBatchOverallSeries">{{series}}</th>
+										</tr>
+										<tr ng-repeat="item in radarBatchOverallTable">
+											<th class="col-sm-2 col-md-2 col-lg-2">{{item.label}}</th>
+											<td class="col-sm-2 col-md-2 col-lg-2"
+												ng-repeat="dataPoint in item.data track by $index">{{dataPoint}}</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-sm-7 col-md-7 col-lg-7">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							Weekly Progress <i ng-click="downloadChartButton($event)"
+								class="clickableIcons glyphicon glyphicon-save"></i>
+						</div>
+						<div class="panel-body">
+							<div class="chart-container top5">
+								<canvas id="line1" class="chart chart-line"
+									chart-data="weeklyProgressBatchOverallData"
+									chart-labels="weeklyProgressBatchOverallLabels"
+									chart-options="weeklyProgressBatchOverallOptions"
+									chart-colors="weeklyProgressBatchOverallColors"
+									chart-dataset-override="weeklyProgressBatchOverallDsOverride">
+								</canvas>
+								<div class="table-responsive">
+									<table ng-if="weeklyProgressBatchOverallLabels" class="table"
+										style="border-collapse: collapse;">
+										<tr class="col-sm-6 col-md-6 col-lg-6"
+											ng-repeat="label in weeklyProgressBatchOverallLabels track by $index">
+											<th class="pull-left">Week {{label}}</th>
+											<td class="pull-right">{{weeklyProgressBatchOverallData[0][$index]}}</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="batchPanel">
+						<div class="panel panel-default">
+							<div class="panel-heading">Panel Feedback</div>
+							<div class="table-responsive">
+								<table id="batch-panel-status" ng-if="panelsBatchOverall"
+									class="table" style="border-collapse: collapse;">
+									<tr>
+										<th>Trainee</th>
+										<th class="centered-panels">Panel Status</th>
+										<th>Date</th>
+										<th>Time</th>
+										<th class="centered-panels">Repeat Topics</th>
+									</tr>
+									<tr ng-repeat="item in allTraineesPanelData">
+										<!-- Trainee column -->
+										<td class="col-sm-3 col-md-3 col-lg-3" ng-bind="item.trainee"></td>
+										<!-- Panel Status column -->
+										<td class="col-sm-2 col-md-2 col-lg-2"
+											ng-if="item.status == 'Pass'"><span
+											class="fa fa-check fa-2x panel-glyph"> </span></td>
+										<td class="col-sm-2 col-md-2 col-lg-2"
+											ng-if="item.status == 'Repanel'"><span
+											class="glyphicon glyphicon-remove fa-2x panel-glyph"></span>
+										</td>
+										<td class="col-sm-2 col-md-2 col-lg-2" ng-if="!item.status">
+											<span class="fa fa-minus fa-2x panel-glyph"></span>
+										</td>
+										<!-- Date column -->
+										<td class="col-sm-2 col-md-2 col-lg-2" ng-if="item.status"
+											ng-bind="item.date"></td>
+										<td class="col-sm-2 col-md-2 col-lg-2" ng-if="!item.status">
+											<span class="fa fa-minus fa-2x panel-glyph"></span>
+										</td>
+										<!-- Time column -->
+										<td class="col-sm-2 col-md-2 col-lg-2 no-wrap"
+											ng-if="item.status" ng-bind="item.time"></td>
+										<td class="col-sm-2 col-md-2 col-lg-2" ng-if="!item.status">
+											<span class="fa fa-minus fa-2x panel-glyph"></span>
+										</td>
+										<!-- Repanel topics column -->
+										<td class="col-sm-6 col-md-6 col-lg-6 centered-panels"
+											ng-if="item.topics" ng-bind="item.topics"></td>
+										<td class="col-sm-6 col-md-6 col-lg-6" ng-if="!item.topics">
+											<span class="fa fa-minus fa-2x panel-glyph"></span>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Row With Bottom 2 Charts -->
+
+		</div>
+	</div>
+	<!-- Row with all 3 Chart-->
+
+	<!-- Batch -> Week -> Trainee-->
+	<div class="row" ng-if="batchWeekTrainee">
+		<div class="col-sm-12 col-md-12 col-lg-12">
+			<div class="row">
+				<div class="col-sm-12 col-md-12  col-lg-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">Assessment Breakdown</div>
+						<div class="panel-body">
+							<div class="chart-container top5">
+								<canvas id="bar" class="chart chart-bar"
+									chart-data="AssessmentAveragesTraineeWeeklyData"
+									chart-options="AssessmentAveragesTraineeWeeklyOptions"
+									chart-labels="AssessmentAveragesTraineeWeeklyLabels"
+									chart-series="AssessmentAveragesTraineeWeeklySeries"
+									chart-colors="AssessmentAveragesTraineeWeeklyColors">
+								</canvas>
+								<div class="table-responsive">
+									<table ng-if="AssessmentAveragesTraineeWeeklyLabels"
+										class="table" style="border-collapse: collapse;">
+										<tr>
+											<th></th>
+											<th class="col-sm-2 col-md-2 col-lg-2"
+												ng-repeat="label in AssessmentAveragesTraineeWeeklyLabels">{{label}}</th>
+										</tr>
+										<tr
+											ng-repeat="series in AssessmentAveragesTraineeWeeklyData track by $index">
+											<th>{{AssessmentAveragesTraineeWeeklySeries[$index]}}</th>
+											<td class="col-sm-2 col-md-2 col-lg-2"
+												ng-repeat="dataPoint in series track by $index">{{dataPoint}}</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4 col-md-4  col-lg-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">Technical Skills</div>
+						<div class="panel-body">
+							<div class="chart-container top5">
+								<canvas id="radarTraineeWeekly" class="chart chart-radar"
+									chart-data="radarTraineeWeeklyData"
+									chart-labels="radarTraineeWeeklyLabels"
+									chart-options="radarTraineeWeeklyOptions"
+									chart-series="radarTraineeWeeklySeries"
+									chart-colors="radarTraineeWeeklyColors">
+								</canvas>
+								<div class="table-responsive">
+									<table ng-if="radarTraineeWeeklyTable" class="table"
+										style="border-collapse: collapse;">
+										<tr>
+											<th class="col-sm-2 col-md-2 col-lg-2"></th>
+											<th class="col-sm-2 col-md-2 col-lg-2 ng-binding"
+												ng-repeat="series in radarTraineeWeeklySeries">{{series}}</th>
+										</tr>
+										<tr ng-repeat="item in radarTraineeWeeklyTable">
+											<th class="col-sm-2 col-md-2 col-lg-2">{{item.label}}</th>
+											<td class="col-sm-2 col-md-2 col-lg-2 ng-binding"
+												ng-repeat="dataPoint in item.data track by $index">{{dataPoint}}</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Yanilda -->
+				<div class="col-sm-8 col-md-8 col-lg-8">
+					<div class="panel panel-default">
+						<div class="panel-heading">Weekly Progress</div>
+						<div class="panel-body">
+							<div class="chart-container top5">
+								<canvas id="linechart" class="chart chart-line"
+									chart-data="linechartTWData" chart-labels="linechartTWLabels"
+									chart-options="linechartTWOptions"
+									chart-series="linechartTWSeries"
+									chart-colors="linechartTWColors"
+									chart-dataset-override="linechartTWDsOverride">
+								</canvas>
+								<div class="table-responsive">
+									<table class="table" style="border-collapse: collapse;">
+										<tr>
+											<th class="col-sm-2 col-md-2 col-lg-2"></th>
+											<th class="col-sm-1 col-md-1 col-lg-1"
+												ng-repeat="label in linechartTWLabels">Week {{label}}</th>
+										</tr>
+										<tr ng-repeat="series in linechartTWData track by $index">
+											<th>{{linechartTWSeries[$index]}}</th>
+											<td class="col-sm-1 col-md-1 col-lg-1"
+												ng-repeat="dataPoint in series track by $index">{{dataPoint}}</td>
+										</tr>
+									</table>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Row With Bottom 2 Charts -->
+			</div>
+			<!-- Row with panel table -->
+		</div>
+		<div ui-view="trainee-week" ng-if="displayTable()"></div>
+	</div>
+	<!-- Row with all 3 Chart-->
+
+	<!-- Batch -> Overall -> Trainee-->
+	<div class="row" ng-if="batchOverallTrainee">
+		<div class="col-sm-12 col-md-12 col-lg-12">
+			<div class="row">
+				<div class="col-sm-12 col-md-12 col-lg-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							Assessment Breakdown <i ng-click="downloadChartButton($event)"
+								class="clickableIcons glyphicon glyphicon-save"></i>
+						</div>
+						<div class="panel-body">
+							<div class="chart-container top5">
+								<canvas id="bar" class="chart chart-bar"
+									chart-data="AssessmentAveragesTraineeOverallData"
+									chart-options="AssessmentAveragesTraineeOverallOptions"
+									chart-labels="AssessmentAveragesTraineeOverallLabels"
+									chart-series="AssessmentAveragesTraineeOverallSeries"
+									chart-colors="AssessmentAveragesTraineeOverallColors">
+								</canvas>
+								<div class="table-responsive">
+									<table ng-if="AssessmentAveragesTraineeOverallLabels"
+										class="table" style="border-collapse: collapse;">
+										<tr>
+											<th></th>
+											<th class="col-sm-2 col-md-2 col-lg-2"
+												ng-repeat="label in AssessmentAveragesTraineeOverallLabels">{{label}}</th>
+										</tr>
+										<tr
+											ng-repeat="series in AssessmentAveragesTraineeOverallData track by $index">
+											<th>{{AssessmentAveragesTraineeOverallSeries[$index]}}</th>
+											<td class="col-sm-2 col-md-2 col-lg-2"
+												ng-repeat="dataPoint in series track by $index">{{dataPoint}}</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-sm-4 col-md-4 col-lg-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							Technical Skills <i ng-click="downloadChartButton($event)"
+								class="clickableIcons glyphicon glyphicon-save"></i>
+						</div>
+						<div class="panel-body">
+							<div class="chart-container top5">
+								<canvas id="radarTraineeOverall" class="chart chart-radar"
+									chart-data="radarTraineeOverallData"
+									chart-labels="radarTraineeOverallLabels"
+									chart-options="radarTraineeOverallOptions"
+									chart-series="radarTraineeOverallSeries"
+									chart-colors="radarTraineeOverallColors">
+								</canvas>
+								<div class="table-responsive">
+									<table ng-if="radarTraineeOverallTable" class="table"
+										style="border-collapse: collapse;">
+										<tr>
+											<th class="col-sm-2 col-md-2 col-lg-2"></th>
+											<th class="col-sm-2 col-md-2 col-lg-2 ng-binding"
+												ng-repeat="series in radarTraineeOverallSeries">{{series}}</th>
+										</tr>
+										<tr ng-repeat="item in radarTraineeOverallTable">
+											<th class="col-sm-2 col-md-2 col-lg-2">{{item.label}}</th>
+											<td class="col-sm-2 col-md-2 col-lg-2 ng-binding"
+												ng-repeat="dataPoint in item.data track by $index">{{dataPoint}}</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-sm-8 col-md-8 col-lg-8">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							Weekly Progress <i ng-click="downloadChartButton($event)"
+								class="clickableIcons glyphicon glyphicon-save"></i>
+						</div>
+						<div class="panel-body">
+							<div class="chart-container top5">
+								<canvas id="line9" class="chart chart-line"
+									chart-data="batchOverallWeeklyData"
+									chart-options="batchOverallWeeklyOptions"
+									chart-labels="batchOverallWeeklyLabels"
+									chart-series="batchOverallWeeklySeries"
+									chart-colors="batchOverallWeeklyColors"
+									chart-dataset-override="batchOverallWeeklyDsOverride">
+								</canvas>
+								<div class="table-responsive">
+									<table ng-if="batchOverallWeeklyLabels" class="table"
+										style="border-collapse: collapse;">
+										<tr>
+											<th class="col-sm-2 col-md-2 col-lg-2"></th>
+											<th class="col-sm-1 col-md-1 col-lg-1"
+												ng-repeat="label in batchOverallWeeklyLabels">Week
+												{{label}}</th>
+										</tr>
+										<tr
+											ng-repeat="series in batchOverallWeeklyData track by $index">
+											<th>{{batchOverallWeeklySeries[$index]}}</th>
+											<td class="col-sm-1 col-md-1 col-lg-1"
+												ng-repeat="dataPoint in series track by $index">{{dataPoint}}</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Row With Bottom 2 Charts -->
+		</div>
+		<div ui-view="trainee-overall" ng-if="displayTraineeOverallTable()"></div>
+		<!--view for panel report display -->
+		<div ui-view="panel-report-display"
+			ng-if="displayTraineePanelFeedback()"></div>
+	</div>
+	<!-- Row with all 3 Chart-->
+
+</div>
+<!-- top10 data-container -->
+</div>
+<!-- caliber-container -->
+
+<!-- Modal for Radar Comparison Chart -->
+<div class="modal fade" id="insert-trainee" tabindex="-1" role="dialog"
+	aria-labelledby="batchModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Trainee Comparison</h4>
+			</div>
+			<div class="modal-body">
+				<div class="table-responsive">
+					<table class="table">
+						<tr class="col-xs-6 col-sm-6 col-md-4"
+							ng-repeat="trainee in currentBatch.trainees track by $index">
+							<th class="col-sm-2 col-md-2 col-lg-2">{{trainee.name}} <input
+								type="checkbox" class="pull-right" ng-model="isChecked"
+								ng-change="toggleComparisonRadarChart(isChecked, $index)" />
+							</th>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal -->
+<div id="notesModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content" ng-if="person && week">
+
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">{{person}} - Week {{week}} Notes</h4>
+			</div>
+			<div class="modal-body" ng-bind="individualNote">
+				<p>{{individualNote}}</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+<div id="batchOverallModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content" ng-if="overallBatchWeek">
+
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Batch Overall Notes - Week
+					{{overallBatchWeek}}</h4>
+			</div>
+			<div class="modal-body" ng-bind="batchNote">
+				<p>{{batchNote}}</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+
+	</div>
+</div>

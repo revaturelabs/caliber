@@ -1,0 +1,29 @@
+<!--********************************************* Confirm Task Deactivate Modal ************************************-->
+<form>
+	<div class="modal fade" id="deactivateTaskModal" tabindex="0"
+		role="dialog" aria-labelledby="taskModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="taskModalLabel">Deactivate
+						Task</h4>
+				</div>
+				<div class="modal-body">
+					<h3>Are you sure you want to deactivate this task: <br><br> "{{task.description}}" ?</h3>
+					<br> <h4 class="warning">Deactivating this task will deactivate it for all trainers.</h4>
+					<br />
+				</div>
+				<div class="modal-footer">
+				<!-- PLAY WITH THE $INDEX THING!!! (NG-ONCLICK) -->
+					<input type="submit" ng-click="deactivateTask(task)" value="Deactivate"
+						class="btn btn-lg btn-danger" data-dismiss="modal">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>

@@ -1,0 +1,72 @@
+<div ng-init="loadAllTrainers()">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 col-lg-12">
+				<ul class="nav nav-tabs">
+					<li role="button" class="pull-right" data-toggle="modal"
+						data-target="#createTrainerModal" ng-click="resetTrainerForm()"><a>Create
+							Trainer <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+					</a></li>
+
+				</ul>
+
+			</div>
+
+		</div>
+
+	</div>
+ 
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 col-lg-12">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Title</th>
+							<th>Email</th>
+							<th>Tier</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="trainer in allTrainers track by $index">
+							<td>{{trainer.name}}</td>
+							<td>{{trainer.title}}</td>
+							<td>{{trainer.email}}</td>
+							<td>{{trainer.tier.substr(5)}}</td>
+							<!-- Buttons -->
+							<!--  <td><a role="button" class="pull-right"
+								ng-click="populateTrainer($index)" data-toggle="modal"
+								data-target="#trainerTaskModal"><span
+									ng-class="{'glyphicon glyphicon-list-alt' : trainer.title == 'Junior Trainer'}" aria-hidden="true"></span></a></td>
+							-->
+							<td><a role="button" class="pull-right"
+								ng-click="populateTrainer($index)" data-toggle="modal"
+								data-target="#editTrainerModal"><span
+									class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a></td>
+							<td><a role="button" class="pull-right"
+								ng-click="populateTrainer($index)" data-toggle="modal"
+								data-target="#deleteTrainerModal"><span
+									class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
+						</tr>
+					</tbody>
+
+				</table>
+
+			</div>
+
+		</div>
+	</div>
+
+
+	<!-- modal form for creating a trainer -->
+	<div ui-view="create-trainer-form"></div>
+	<!-- modal form for editing a trainer -->
+	<div ui-view="edit-trainer-form"></div>
+	<!-- modal form for deactivating a trainer -->
+	<div ui-view="delete-trainer-form"></div>
+	<!-- confirm, and error models for trainees -->
+	<div ui-view="trainer-extra-modals"></div>
+	<!-- modal form for trainer checklist -->
+	<!--  div ui-view="trainer-checklist-form"></div> -->
+</div>

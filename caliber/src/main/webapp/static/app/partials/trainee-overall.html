@@ -1,0 +1,36 @@
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12 col-md-12 col-lg-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">Overall Feedback</div>
+				<table class='table table=responsive'>
+					<thead>
+						<tr>
+							<th class='col-sm-1 col-md-1 col-lg-1 center'>Week</th>
+							<th class='col-sm-3 col-md-3 col-lg-3 center'>Categories</th>
+							<th class='col-sm-1 col-md-1 col-lg-1 center'>Quality Audit</th>
+							<th class='col-sm-3 col-md-3 col-lg-3 center'>QC Feedback</th>
+							<th class='col-sm-4 col-md-4 col-lg-4 center'>Trainer
+								Feedback</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="report in traineeOverall"
+							ng-if="report.qcNote.qcStatus || report.qcNote.content || report.trainerNote.content">
+							<td class='col-sm-1 col-md-1 col-lg-1 center'>{{report.week}}</td>
+							<td class='col-sm-3 col-md-3 col-lg-3 center'><span
+								ng-repeat="category in categories[$index].$$state.value track by $index">{{category}}{{$last
+									? '' : ', '}}</span></td>
+							<td class='col-sm-1 col-md-1 col-lg-1 center'>{{report.qcNote.qcStatus
+								? report.qcNote.qcStatus : "-"}}</td>
+							<td class='col-sm-3 col-md-3 col-lg-3 center'>{{report.qcNote.content
+								? report.qcNote.content : "-"}}</td>
+							<td class='col-sm-4 col-md-4 col-lg-4 center'>{{report.trainerNote.content
+								? report.trainerNote.content : "-"}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

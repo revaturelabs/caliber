@@ -1,0 +1,75 @@
+<!-- display table for the batch and week selected -->
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12 col-md-12 col-lg-12 top5">
+
+			<div class="panel panel-default">
+				<div class="panel-heading">Feedback for the Week</div>
+				<div class="panel-body">
+					<div class="chart-container top5">
+						<table
+							class="table table-responsive col-sm-12 col-md-12 col-lg-12"
+							style="border-collapse: collapse;" ng-show="currentView">
+							<thead>
+								<tr>
+									<strong>Categories covered this week: </strong>
+									<span ng-repeat="category in categories">{{category}}{{$last
+										? '' : ', '}}</span>
+								</tr>
+								<tr>
+									<th class="col-sm-2 col-md-2 col-lg-2">Trainee</th>
+									<th class="col-sm-1 col-md-1 col-lg-1"
+										ng-repeat="assessment in currentAssessments track by $index">
+										{{assessment.title}}({{assessmentsById[assessment.assessmentId].weightedScore}})</th>
+									<th class="col-sm-9 col-md-9 col-lg-9"></th>
+								</tr>
+							</thead>
+							<tbody
+								ng-repeat="trainee in currentBatch.trainees track by $index">
+								<tr>
+									<th class="col-sm-2 col-md-2 col-lg-2" rowspan="2">{{
+										trainee.name }}
+									</td>
+									<td class="col-sm-1 col-md-1 col-lg-1"
+										ng-repeat="assessment in currentAssessments track by assessment.assessmentId">
+										
+										<p 
+										ng-value="findGrade(trainee.traineeId,assessment.assessmentId)"
+										>{{trainees[trainee.traineeId].assessments[assessment.assessmentId].score}} </p>
+									</td>
+									<td class="col-sm-9 col-md-9 col-lg-9"></td>
+								</tr>
+								<tr>
+									<td colspan="100"><strong>Notes: </strong>
+										{{trainees[trainee.traineeId].note.content}}</td>
+								</tr>
+							</tbody>
+							<tfoot>
+								<td><strong>Average</strong></td>
+								<td
+									ng-repeat="assessment in currentAssessments track by assessment.assessmentId">{{getTotalAssessmentAvgForWeek(assessment,trainees)
+									? (getTotalAssessmentAvgForWeek(assessment,trainees) |
+									number:2) + "%" : "-"}}</td>
+								<td>{{ (allAssessmentsAvgForWeek === false ? "Calculating
+									Weekly Batch Avg " : "Weekly Batch Avg= " +
+									allAssessmentsAvgForWeek) }}<i
+									ng-show="!allAssessmentsAvgForWeek" class='fa fa-cog fa-spin'></i>
+								</td>
+
+
+							</tfoot>
+						</table>
+						<table class='table'>
+							<tr>
+								<td
+									class="form-group col-lg-12 col-md-12 col-sm-12 overall-feedback">
+									<strong>Notes :</strong> {{trainerBatchNote.content}}
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

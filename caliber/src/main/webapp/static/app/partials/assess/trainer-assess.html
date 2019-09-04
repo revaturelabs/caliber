@@ -1,0 +1,324 @@
+<!-- Year selector and Add Assessment button -->
+<div class="container">
+	<div class="row">
+		<div class="col-lg-12 col-md-12 col-sm-12" ng-show="!currentView">
+			<button class="btn back-btn" ng-click="back()">
+				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+				Back
+			</button>
+		</div>
+		<div class="col-md-12 col-lg-12 top10">
+			<!-- top ui for viewing all assessments -->
+			<ul class="nav nav-tabs" ng-show="currentView">
+				<!-- top ui for viewing all assessments -->
+				<!-- Filter batches by year -->
+				<li role="button" class="dropdown"><a class="dropdown-toggle"
+					data-toggle="dropdown">{{selectedYear}}<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li ng-repeat="menuItem in years track by $index"><a
+							role="button" ng-click="selectYear($index)">{{menuItem}}</a></li>
+					</ul></li>
+				<li role="button" class="dropdown" ng-show="!noBatches"><a
+					class="dropdown-toggle" data-toggle="dropdown"> {{
+						currentBatch.trainer.name }} - {{ currentBatch.startDate |
+						date:'shortDate' }} <span class="caret"></span>
+				</a>
+					<ul class="dropdown-menu">
+						<li ng-repeat="batch in batchesByYear track by $index"><a
+							role="button" ng-click="selectCurrentBatch($index)">
+								{{batch.trainer.name}} - {{batch.startDate | date:'shortDate'}}
+						</a></li>
+					</ul></li>
+				<!-- Button Trigger for Import Grades Modal -->
+				<li role="button" class="pull-right" ng-show="!noBatches"
+					data-toggle="modal" data-target="#importGradesModal"><a>Import
+						Grades <span class="glyphicon glyphicon-download"
+						aria-hidden="true"> </span>
+				</a></li>
+				<!-- Button Trigger for Create Assessment Modal -->
+				<li role="button" class="pull-right" ng-show="!noBatches"
+					data-toggle="modal" data-target="#createAssessmentModal"><a>Create
+						Assessment<span class="glyphicon glyphicon-plus"
+						aria-hidden="true"> </span>
+				</a></li>
+			</ul>
+			<!-- top ui for viewing trainee grades -->
+			<ul class="nav nav-tabs" ng-show="!currentView">
+				<li role="button" class="dropdown"><a class="dropdown-toggle"
+					data-toggle="dropdown">{{ currentAssessment.title }}<span
+						class="caret"></span>
+				</a>
+					<ul class="dropdown-menu">
+						<li ng-repeat="assessment in currentAssessments track by $index">
+							<a role="button" ng-click="selectAssessment($index)">{{
+								assessment.title }}</a>
+						</li>
+					</ul></li>
+				<li role="button" class="pull-right" ng-show="currentView"
+					data-toggle="modal" data-target="#createAssessmentModal"><a>Create
+						Assessment<span class="glyphicon glyphicon-plus"
+						aria-hidden="true"></span>
+				</a></li>
+			</ul>
+		</div>
+		<div class="col-sm-12 col-md-12 col-lg-12 top5" ng-show="!noBatches">
+			<ul class="nav nav-tabs">
+				<li role="button" class="{{showActiveWeek($index)}}"
+					ng-click="selectWeek($index)"
+					ng-repeat="week in currentBatch.arrayWeeks track by $index"><a>Week
+						{{week}}</a></li>
+				<!-- Button Trigger for Create Week Modal -->
+				<li role="button" ng-show="!noBatches" data-toggle="modal"
+					data-target="#confirmingweeks"><a><span
+						class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></li>
+			</ul>
+		</div>
+	</div>
+	<!-- If no data display below text -->
+	<div class="bg-primary align center" ng-if="!currentBatch">No
+		data available for {{ selectedYear }}.</div>
+</div>
+<!-- Assessments table -->
+<div class="container" id="trainer-assess-table" ng-if="currentBatch">
+	<div class="row">
+		<div class="col-md-12 col-lg-12 top5">
+			<p class="bg-primary align center" ng-show="noTrainees">{{noTraineesMessage}}</p>
+			<ul class="nav nav-tabs" ng-show="!noTrainees">
+
+				<p class="bg-primary align center" ng-show="noBatches">{{noBatchesMessage}}</p>
+				<ul class="nav nav-tabs" ng-show="!noBatches">
+					<!-- Accordian table -->
+					<table class="table table-responsive"
+						style="border-collapse: collapse;" ng-show="currentView">
+						<thead>
+							<tr sticky class='sticky-header'>
+								<th class="col-sm-2 col-md-2 col-lg-2">Trainee</th>
+								<th class="col-sm-1 col-md-1 col-lg-1"></th>
+								<div>
+									<th class="col-sm-1 col-md-1 col-lg-1 text-center"
+										role="button" data-toggle="modal"
+										data-ng-click="setUpdateAssessmentToCurrent($index)"
+										data-target="#editAssessmentModal_{{assessment.assessmentId}}"
+										ng-repeat="assessment in currentAssessments track by $index">
+										{{assessment.title}}
+										({{assessmentsById[assessment.assessmentId].weightedScore}})
+										<div ui-view="trainer-edit-assess"></div>
+									</th>
+									<th class="col-sm-9 col-md-9 col-lg-9">Notes</th>
+								</div>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+								;
+								ng-repeat="trainee in currentBatch.trainees track by $index">
+								<ng-form name="gradeFieldForm">
+								<td role="button" class="col-sm-2 col-md-2 col-lg-2"
+									ng-click="toggleColor(trainee, $index)">{{ trainee.name }}</td>
+								<td class="col-sm-1 col-md-1 col-lg-1"><span
+									ng-mouseover="showNotes($index)"
+									ng-mouseleave="hideNotes($index)"
+									ng-init="initFlags(trainee, $index)"
+									class="glyphicon glyphicon-flag"></span>
+									<form ng-if="showCommentForm[$index]" class="commentForm"
+										ng-submit="updateFlag(trainee, $index)"
+										style="display: inline-block; position: absolute; padding: 5px; border-radius: 5px; margin-left: 5px; background-color: white; border: solid #ccc 1px; z-index: 1">
+										<input type="text" placeholder="comment" name="statusComment"
+											ng-model="trainee.flagNotes"> <input type="submit"
+											value="Save"> <span ng-click="closeComment()"
+											class="glyphicon glyphicon-remove-sign"></span>
+									</form>
+									<div ng-if="showCommentBox[$index] && currentBatch.trainees[$index].flagNotes"
+										style="z-index: 1; display: inline-block; position: absolute; padding: 5px; border: 1px solid #CCC; border-radius: 5px; background-color: white"
+										class="notes">
+										<span>{{trainee.flagNotes}}</span>
+									</div></td>
+								<td class="text-center col-sm-1 col-md-1 col-lg-1"
+									ng-repeat="assessment in currentAssessments track by $index">
+									<input
+									ng-class="{'has-error':validateGrade(trainees[trainee.traineeId].assessments[assessment.assessmentId].score)}"
+									class="form-control" type="number" min="0" max="100"
+									ng-model="trainees[trainee.traineeId].assessments[assessment.assessmentId].score"
+									ng-blur='(trainees[trainee.traineeId].assessments[assessment.assessmentId].score > 0 || trainees[trainee.traineeId].assessments[assessment.assessmentId].score <=100 )? updateGrade(trainee,assessment) : ""'
+									ng-value="findGrade(trainee.traineeId,assessment.assessmentId)"
+									ng-minlength="1" />
+								</td>
+								<td class="col-sm-8 col-md-8 col-lg-8"><textarea
+										class="form-control note-mw" name="note" cols="20" rows="2"
+										ng-model="trainees[trainee.traineeId].note.content"
+										ng-blur="saveOrUpdateTraineeNote(trainee.traineeId)">
+								</textarea></td>
+								</ng-form>
+							</tr>
+						</tbody>
+						<tfoot>
+							<td>Average</td>
+							<td></td>
+							<td class="text-center"
+								ng-repeat="assessment in currentAssessments track by $index">
+								{{getTotalAssessmentAvgForWeek(assessment,trainees) ?
+								(getTotalAssessmentAvgForWeek(assessment,trainees) | number:2) +
+								"%" : "-"}}</td>
+
+							<td ng-if="grades"><span style="font-weight: bold">{{boldBatchAverage()}}</span>
+								<span ng-if="isThereAvgForWeek">{{allAssessmentsAvgForWeek}}</span><i
+								ng-show="!allAssessmentsAvgForWeek" class='fa fa-cog fa-spin'></i>
+							</td>
+							<td ng-if="!grades"></td>
+						</tfoot>
+
+					</table>
+					<div ng-show="hasError" class='has-error'>has error</div>
+					<div
+						class="form-group col-lg-12 col-md-12 col-sm-12 overall-feedback">
+						<textarea ng-model="$parent.trainerBatchNote.content"
+							class="form-control" id="tBatchNotes"
+							ng-blur="saveTrainerNotes(trainerBatchNote.noteId)"
+							placeholder="Enter your overall feedback on the batch" required>
+					</textarea>
+						<div class='save-button-wrapper'>
+							<a ng-click="doBurrito()" ng-show="showFloppy"
+								class='save-button fade-in'> <span
+								class="fa fa-floppy-o fa-2x" aria-hidden="true"></span>Save
+							</a>
+							<div class='spinner fa-style' ng-show="showSaving">
+								<i style="color: #F26925;" role="button"
+									class="fa fa-spinner fa-spin fa-2x" aria-hidden="true"></i>
+							</div>
+							<div id="checkMark" class='spinner fade fa-style'
+								ng-show="showCheck">
+								<i role="button" class="fa fa-check fa-2x" aria-hidden="true"></i>
+							</div>
+						</div>
+
+					</div>
+				</ul>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<!-- Create Assessment Modal -->
+<div class="modal fade" id="createAssessmentModal" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+
+				<h4 class="modal-title" id="myModalLabel">Create New Assessment</h4>
+			</div>
+			<!-- Add Assessment Info -->
+			<form ng-submit="addAssessment()">
+				<div class="modal-body">
+
+					<div class="row">
+						<div class="form-group col-lg-12 col-md-12 col-sm-12">
+							<label for="category">Assessment Category:</label> <select
+								ng-model="category.model" class="form-control" id="category"
+								required>
+								<option value="" disabled>Select Assessment Category</option>
+								<option ng-repeat="option in category.options"
+									value="{{option}}">{{option.skillCategory}}</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="form-group col-md-6 col-sm-6">
+							<label for="rawScore">Max Points:</label> <input
+								ng-model="rawScore" type="number" class="form-control"
+								id="rawScore" placeholder="99" min="0" step="1" required>
+						</div>
+
+
+						<div class="form-group col-md-6 col-sm-6">
+							<label for="assessmentType">Assessment Type:</label> <select
+								ng-model="assessmentType.model" class="form-control"
+								id="assessmentType" required>
+								<option value="" disabled>Select Assessment Type</option>
+								<option ng-repeat="option in assessmentType.options">{{option}}</option>
+							</select>
+						</div>
+					</div>
+
+				</div>
+				<div class="modal-footer">
+					<input type="submit" value="Save" class="btn btn-primary">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Import Grades Modal -->
+<div class="modal fade" id="importGradesModal" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+
+				<h4 class="modal-title" id="myModalLabel">Import Grades</h4>
+			</div>
+			<!-- Add Grade Json -->
+			<form ng-submit="importGrade()">
+				<div class="modal-body">
+					<div class="row">
+						<div class="form-group col-md-12 col-sm-12"
+							style="text-align: left">
+							<label>Please paste in your exported JSON data from
+								RevaturePro.</label>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-md-12 col-sm-12"
+							style="text-align: left">
+							<textarea placeholder="Quiz Data" cols="75" rows="10"
+								ng-model="quiz.data"></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<input type="submit" value="Save" class="btn btn-primary">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- 		Import Grade Error Modal	 -->
+<div class="modal fade" id="importGradeErrorModal" tabindex="-1"
+	role="dialog" aria-labelledby="importGradeLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="importGradeErrorModalLabel">
+					Error &nbsp;<i class="fa fa-frown-o fa-2x pick" aria-hidden="true"></i>
+				</h4>
+			</div>
+			<div class="modal-body">
+				{{ importGradeError }}<br />
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+			</div>
+		</div>
+
+	</div>
+
+</div>
+
+<div ui-view="confirm-add-weeks-modal"></div>

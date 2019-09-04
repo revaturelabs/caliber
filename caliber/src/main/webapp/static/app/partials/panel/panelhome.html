@@ -1,0 +1,92 @@
+
+<!-- @author Matt 'Spring Data' Prass -->
+<!-- @author Lauren Wallace -->
+<!-- @author Katie Bixby -->
+<div id="manage">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 col-lg-12">
+				<ul class="nav nav-tabs">
+
+					<!-- Button Trigger for Create Panel Modal -->
+					<li role="button" class="pull-right"
+						data-toggle="{{ trainee.name ? 'modal' : '' }}"
+						data-target="#panelmodal" ng-click=""><a>Create Panel<span
+							class="glyphicon glyphicon-plus" aria-hidden="true"> </span>
+					</a></li>
+					<!-- Button Trigger for Import Batch Modal -->
+					<li class="pull-right">
+						<div class="container-1 hideDropdown">
+							<form ng-submit="selectChosenTrainee()">
+								<span class="icon">
+									<button type="submit" class="SearchButton">
+										<i class="fa fa-search"></i>
+									</button>
+								</span> <input ng-change="populateTraineeList()"
+									ng-model="chosenTrainee" list="traineeList" type="search"
+									id="searchTextBox" placeholder="Paste Email"
+									class="form-control SearchPad" autocomplete="off" />
+								<datalist id="traineeList">
+									<option ng-repeat="trainee in employedTrainees track by $index"
+										ng-value="trainee.name" ng-if="chosenTrainee.length>0">
+										{{trainee.name}} | {{trainee.email}} | {{trainee.skypeId}}</option>
+								</datalist>
+							</form>
+						</div>
+					</li>
+				</ul>
+
+				<div class="alert alert-danger fade-speeder" ng-fade="true"
+					ng-if="showMessage" ng-model="errorMessage"
+					ng-bind="errorMessage + trainee.name"></div>
+
+				<div class="panel panel-default" style="margin-top: 20px">
+					<div class="panel-heading">Panel Feedback</div>
+					<div class="panel-body">
+						<div class="table-responsive">
+							<table id="trainee-panel-status" class="table table-condensed"
+								style="width: 100%;">
+								<thead>
+									<tr>
+										<th>Trainee Name</th>
+										<th>Date</th>
+										<th>Panelist</th>
+										<th style="text-align: center">Panel Status</th>
+										<th style="text-align: center">Repeat Topics</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-class="{ highlight: item.id === newPanel.id }"
+										ng-repeat="item in traineePanels">
+										<td ng-bind="item.trainee.name" id="trainee.name"></td>
+										<!-- THESE MIGHT NOT EXIST YET -->
+										<td ng-bind="item.interviewDate"></td>
+										<td ng-bind="item.panelist.name" id="panelist.name"></td>
+										<td ng-if="item.status=='Pass'"><span
+											style="color: #81f575; width: 100%; text-align: center;"
+											class="fa fa-check fa-2x"> </span></td>
+										<td ng-if="item.status=='Repanel'"><span
+											style="color: #ff7575; width: 100%; text-align: center;"
+											class="glyphicon glyphicon-remove fa-2x"></span></td>
+										<td style="text-align: center; height: auto"><b><span
+												ng-repeat="option in item.feedback"
+												ng-if="option.status == 'Repanel'"
+												ng-bind="option.technology.skillCategory"
+												style="display: block"></span></b> <span
+											ng-if="item.status!='Repanel'"
+											style="color: rgb(252, 221, 115); width: 100%; text-align: center;"
+											class="fa fa-minus fa-2x"></span></td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="bg-primary align center"
+								ng-if="!traineePanels && traineePanels.length === 0">This
+								is {{trainee.name}}'s first panel.</div>
+						</div>
+					</div>
+				</div>
+				<div ui-view="panelmodal"></div>
+			</div>
+		</div>
+	</div>
+</div>

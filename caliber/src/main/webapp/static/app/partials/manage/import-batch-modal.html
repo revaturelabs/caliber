@@ -1,0 +1,101 @@
+<!--********************************************* Import Batch Modal ************************************-->
+<form ng-submit="submitImportBatch()">
+	<div class="modal fade" id="importBatchModal" tabindex="-1"
+		role="dialog" aria-labelledby="batchModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" ng-bind="batchFormName"
+						id="batchModalLabel">Import New Batch</h4>
+						<!-- creating branch -->
+				</div>
+				<!-- Import Batch Info -->
+				 <div class="modal-body">
+					<div class="row">
+						<div class="form-group col-lg-12 col-md-12 col-sm-12">
+							<label for="batchItem">Batch:</label> 
+							<select
+								id="importId" ng-value="selectedBatchValue" class="form-control" ng-model="selectedBatch"
+								ng-options="availableBatch as availableBatch.trainingName for availableBatch in allAvailableBatches | orderBy:'trainingName'"
+								ng-change="selectedBatchToImport()">
+							</select>
+						</div>
+					</div>
+					<div ng-if="batchToImport">
+						<div class="row">
+							<div class="form-group col-md-6 col-sm-6">
+								<label for="name">Training Name:</label> <span id="name">{{batchToImport.trainingName}}</span>
+							</div>
+							<div class="form-group col-md-6 col-sm-6">
+								<label for="type">Training Type:</label> <span id="type">{{batchToImport.trainingType}}</span>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group col-md-6 col-sm-6">
+								<label for="skill">Skill Type:</label> <span id="skill">{{batchToImport.skillType}}</span>
+							</div>
+							<!-- <div class="form-group col-md-6 col-sm-6">
+								<label for="location">Location:</label> <span id="location">{{batchToImport.location}}</span>
+							</div> -->
+						<!-- Dropdown for location -->
+						<div class="form-group col-md-6 col-sm-6">
+							<label for="commonLocations">Location :</label>
+							<!-- ng-options is used as opposed to ng-repeat because an entire object needs to be passed -->
+							<select ng-model="batchToImport.address" id="location" required
+								class="form-control" ng-required="true"
+								ng-options="option as (option.company + ', ' + option.street + ' ' + option.city + ' ' + option.state + ' ' + option.zipcode) group by option.state for option in (location.options | orderBy:['state','company']  | filter : {active:true})  track by option.addressId">
+								<option value="" value="">Select Location</option>
+							</select>
+						</div>
+						<!-- Dropdown ends -->
+						</div>
+						<div class="row">
+							<div class="form-group col-md-6 col-sm-6">
+								<label for="trainer">Trainer:</label> <span id="trainer">{{batchToImport.trainer.name}}</span>
+							</div>
+							<div class="form-group col-md-6 col-sm-6">
+								<label for="cotrainer">Co-Trainer:</label> <span id="cotrainer">{{batchToImport.coTrainer.name}}</span>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group col-md-6 col-sm-6">
+								<label for="start">Start Date:</label> <span id="start">{{batchToImport.startDate
+									| date:'yyyy-MM-dd'}}</span>
+							</div>
+							<div class="form-group col-md-6 col-sm-6">
+								<label for="end">End Date:</label> <span id="end">{{batchToImport.endDate
+									| date:'yyyy-MM-dd'}}</span>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div ng-if="batchToImport" class="col-sm-12 col-md-12 col-lg-12">
+							<table class="table table-responsive">
+								<tr>
+									<th>Trainee Name</th>
+									<th>Trainee Email</th>
+									<th>Training Status</th>
+									<th>Phone Number</th>
+								</tr>
+								<tr ng-repeat="trainee in batchToImport.trainees">
+									<td>{{trainee.name}}</td>
+									<td>{{trainee.email}}</td>
+									<td>{{trainee.trainingStatus}}</td>
+									<td>{{trainee.phoneNumber}}</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<input type="submit" value="Import" class="btn btn-primary" />
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>

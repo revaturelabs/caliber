@@ -1,0 +1,38 @@
+<!-- display table for the batch and week selected -->
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12 col-md-12 col-lg-12 top5">
+
+			<div class="panel panel-default">
+				<div class="panel-heading">Feedback for the Week</div>
+				<div class="panel-body">
+					<table class="table table-responsive col-sm-12 col-md-12 col-lg-12"
+						style="border-collapse: collapse;">
+						<thead>
+							<tr>
+								<strong>Categories covered this week: </strong>
+								<span ng-repeat="category in categories">{{category}}{{$last
+									? '' : ', '}}</span>
+							</tr>
+							<tr>
+								<!--<th class="col-sm-2 col-md-2 col-lg-2">Trainee</th>-->
+								<th class="col-sm-5 col-md-5 col-lg-5">Trainer Feedback</th>
+								<th class="col-sm-2 col-md-2 col-lg-2">Quality Audit</th>
+								<th class="col-sm-5 col-md-5 col-lg-5">QC Feedback</th>
+							</tr>
+						</thead>
+						<tbody>
+
+							<tr>
+								<!-- <td class = "col-sm-2 col-md-2 col-lg-2">{{currentTrainee.name}}</td> -->
+								<td class="col-sm-5 col-md-5 col-lg-5">{{note.content}}</td>
+								<td class="col-sm-2 col-md-2 col-lg-2">{{qcNote.qcStatus}}</td>
+								<td class="col-sm-5 col-md-5 col-lg-5">{{qcNote.content}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

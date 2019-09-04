@@ -1,0 +1,128 @@
+<div class="bg-primary align center" ng-if="!currentBatch">No data available.</div>
+<div ng-if="currentBatch">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 col-lg-12">
+				<ul class="nav nav-tabs">
+					<!-- Select Batch-->
+					<li role="button" class="dropdown"><a class="dropdown-toggle"
+						data-toggle="dropdown">{{currentBatch.trainingName}}<span
+							class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a role="button" ng-click="selectCurrentBatch(-1)">None</a></li>
+							<li ng-repeat="menuItem in batches track by $index"><a
+								role="button" ng-click="selectCurrentBatch($index)">{{menuItem.trainingName}}</a></li>
+						</ul></li>
+					<!-- Select Trainee-->
+					<li role="button" class="dropdown"><a class="dropdown-toggle"
+						ng-show="hideOtherTabs()" data-toggle="dropdown">{{currentTrainee.name}}<span
+							class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a role="button" ng-click="selectCurrentTrainee(-1)">None</a></li>
+							<li ng-repeat="menuItem in currentBatch.trainees track by $index"><a
+								role="button" ng-click="selectCurrentTrainee($index)">{{menuItem.name}}</a></li>
+						</ul></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<!-- Charts -->
+	<div class="container">
+		<div class="top10 data-container">
+			<div class="row">
+				<div class="col-sm-12 col-md-12 col-lg-12">
+					<div class="row">
+						<div class="col-sm-12 col-md-12" ng-show="showCharts(0)">
+							<div class="panel panel-default">
+								<div class="panel-heading panel-rev">All My Batches</div>
+								<div class="panel-body">
+									<div class="chart-container top5">
+										<canvas id="batchesRank" class="chart-horizontal-bar"
+											chart-data="allBatchesRankData"
+											chart-labels="allBatchesRankLabels"
+											chart-series="allBatchesRankSeries" height="100" width="100">
+                                    </canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6 col-md-6" ng-show="showCharts(1)">
+							<div class="panel panel-default">
+								<div class="panel-heading">Technical Skills for
+									{{currentBatch.trainingName}}</div>
+								<div class="panel-body">
+									<div class="chart-container top5">
+										<canvas id="radar" class="chart chart-radar"
+											chart-data="batchTechData" chart-options="batchTechOptions"
+											chart-labels="batchTechLabels" chart-series="batchTechSeries"
+											height="100" width="100">
+                                    </canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6 col-md-6" ng-show="showCharts(1)">
+							<div class="panel panel-default">
+								<div class="panel-heading">Weekly Progress for
+									{{currentBatch.trainingName}}</div>
+								<div class="panel-body">
+									<div class="chart-container top5">
+										<canvas id="batch-line" class="chart chart-line"
+											chart-data="batchProgressData"
+											chart-labels="batchProgressLabels"
+											chart-series="batchProgressSeries"
+											chart-options="batchProgressOptions"
+											chart-dataset-override="batchProgressDatasetOverride"
+											height="100" width="100">
+                                    </canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6 col-md-6" ng-show="showCharts(3)">
+							<div class="panel panel-default">
+								<div class="panel-heading">Weekly Progress for
+									{{currentTrainee.name}}</div>
+								<div class="panel-body">
+									<div class="chart-container top5">
+										<canvas id="line" class="chart chart-line"
+											chart-data="traineeProgressData"
+											chart-labels="traineeProgressLabels"
+											chart-series="traineeProgressSeries"
+											chart-options="traineeProgressOptions"
+											chart-dataset-override="traineeProgressDatasetOverride"
+											chart-click="lineOnClick" height="100" width="100">
+                                    </canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6 col-md-6" ng-show="showCharts(3)">
+							<div class="panel panel-default">
+								<div class="panel-heading">Technical Skills for
+									{{currentTrainee.name}}</div>
+								<div class="panel-body">
+									<div class="chart-container top5">
+										<canvas id="radar2" class="chart chart-radar"
+											chart-data="traineeTechData" chart-labels="traineeTechLabels"
+											chartData="traineeTechSeries"
+											chart-options="traineeTechOptions" height="100" width="100">
+                                    </canvas>
+									</div>
+								</div>
+								<div id="legendDiv"></div>
+							</div>
+						</div>
+					</div>
+					<!-- row -->
+					<div class="chartline">
+						<h2 class="title">LineChart</h2>
+						<canvas id="batch-line" width="640" height="400"></canvas>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
