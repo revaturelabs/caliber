@@ -9,7 +9,7 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<itext.pdf.version>5.5.11</itext.pdf.version>
+		<itext.pdf.version>5.5.13.3</itext.pdf.version>
 		<itext.tool.version>5.5.11</itext.tool.version>
 	</properties>
 
